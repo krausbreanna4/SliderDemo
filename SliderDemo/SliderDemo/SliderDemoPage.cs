@@ -76,7 +76,73 @@ namespace SliderDemo
 
         private void OnLabelTapped(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            GridItem item = (GridItem)sender;
+
+            Random rand = new Random();
+            int move = rand.Next(0, 4);
+
+            //Adjust random move to account for edges
+            if (move == 0 && item.Position.Row == 0)
+            {
+                move = 2;
+            }
+
+            else if (move== 1 && item.Position.Column == SIZE - 1)
+            {
+                move = 3;
+            }
+
+            else if (move == 2 && item.Position.Row == SIZE - 1)
+            {
+                move = 0;
+            }
+
+            else if (move == 3 && item.Position.Column == 0)
+            {
+                move = 1;
+            }
+
+            int row = 0;
+            int col = 0;
+
+            if (move == 0) //Move Up
+            {
+                row = item.Position.Row - 1;
+                col = item.Position.Column;
+            }
+
+            else if (move == 1) //Move Right
+            {
+                row = item.Position.Row;
+                col = item.Position.Column + 1;
+            }
+            else if (move == 2) //Move DOWN
+            {
+                row = item.Position.Row + 1;
+                col = item.Position.Column;
+            }
+            else //Move Left
+            {
+                row = item.Position.Row;
+                col = item.Position.Column - 1;
+            }
+
+            GridItem swapWith = _gridItems[new GridPosition(row, col)];
+            Swap(item, swapWith);
+            OnContentViewSizeChanged(this.Content, null);
+            //throw new NotImplementedException();
+        }
+
+        void Swap(GridItem item1, GridItem item2)
+        {
+            //First Swap positions
+            GridPosition temp = item1.Position;
+            item1.Position = item2.Position;
+            item2.Position = temp;
+
+            //Then update Dictionary too!
+            _gridItems[item1.Position] = item1;
+            _gridItems[item2.Position] = item2;
         }
 
         internal class GridItem : Label //by extending :Label gives inheritence, allowing text, etc. and allows the grid item to be aware of its location
