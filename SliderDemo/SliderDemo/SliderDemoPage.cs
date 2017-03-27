@@ -145,7 +145,7 @@ namespace SliderDemo
             _gridItems[item2.Position] = item2;
         }
 
-        internal class GridItem : Label //by extending :Label gives inheritence, allowing text, etc. and allows the grid item to be aware of its location
+        internal class GridItem : Image //by extending :Label gives inheritence, allowing text, etc. and allows the grid item to be aware of its location
     {
             public GridPosition Position
             {
@@ -155,10 +155,11 @@ namespace SliderDemo
             public GridItem(GridPosition position, String text)
             {
                 Position = position;
-                Text = text;
-                TextColor = Color.White;
-                HorizontalOptions = LayoutOptions.Center;
-                VerticalOptions = LayoutOptions.Center;
+                Source = ImageSource.FromResource(
+                    "SliderDemo.images.image" + text +".jpeg");
+                
+                HorizontalOptions = LayoutOptions.FillAndExpand;
+                VerticalOptions = LayoutOptions.FillAndExpand;
             }
     }
 

@@ -56,6 +56,24 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="images\image1.jpeg" />
+    <EmbeddedResource Include="images\image10.jpeg" />
+    <EmbeddedResource Include="images\image11.jpeg" />
+    <EmbeddedResource Include="images\image12.jpeg" />
+    <EmbeddedResource Include="images\image13.jpeg" />
+    <EmbeddedResource Include="images\image14.jpeg" />
+    <EmbeddedResource Include="images\image15.jpeg" />
+    <EmbeddedResource Include="images\image16.jpeg" />
+    <EmbeddedResource Include="images\image2.jpeg" />
+    <EmbeddedResource Include="images\image3.jpeg" />
+    <EmbeddedResource Include="images\image4.jpeg" />
+    <EmbeddedResource Include="images\image5.jpeg" />
+    <EmbeddedResource Include="images\image6.jpeg" />
+    <EmbeddedResource Include="images\image7.jpeg" />
+    <EmbeddedResource Include="images\image8.jpeg" />
+    <EmbeddedResource Include="images\image9.jpeg" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.2.0.45\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.2.0.45\build\portable-win+net45+wp80+win81+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10\Xamarin.Forms.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
