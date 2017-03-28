@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SliderDemo.WinPhone", "Slid
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SliderDemo.Windows", "SliderDemo\SliderDemo.Windows\SliderDemo.Windows.csproj", "{EDCBCD8A-45FA-4866-AAE0-304D5150D706}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F03868C4-48F5-4CE9-A129-4680291AE121}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU

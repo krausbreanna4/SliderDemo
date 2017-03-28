@@ -17,6 +17,7 @@ namespace SliderDemo
         private AbsoluteLayout _absoluteLayout; //layout of the application
         private Dictionary<GridPosition, GridItem> _gridItems; //Dictionary allows Keys .. Click the lightblub to generate GridPosition and GridItem as class
 
+        //constructor
         public SliderDemoPage()
         {
             _gridItems = new Dictionary<GridPosition, GridItem>();
@@ -33,19 +34,30 @@ namespace SliderDemo
             {
                 for (var col = 0; col < SIZE; col++)
                 {
-                    GridItem item = new GridItem(new GridPosition(row, col),
-                        counter.ToString()); //counter is the text that will show up on the gridItem
+                    GridItem item;
+                    if (counter == 16)
+                    {
+                        item = new GridItem(new GridPosition(row, col), "imageEmpty"); //counter is the text that will show up on the gridItem
+                        item.ImgPath = "16";
+                    }
 
+                    else
+                    {
+                         item = new GridItem(new GridPosition(row, col),
+                            counter.ToString()); //counter is the text that will show up on the gridItem
+                    }
                     var tapRecognizer = new TapGestureRecognizer(); //these next three lines allow you to tap on the gridItem and move randomly
                     tapRecognizer.Tapped += OnLabelTapped;
                     item.GestureRecognizers.Add(tapRecognizer); //adding an event handler (tapped recognized) to our gridItem
 
-                    _gridItems.Add(item.Position, item);
+                    _gridItems.Add(item.CurrentPosition, item);
                     _absoluteLayout.Children.Add(item);
 
                     counter++;
                 }
             }
+
+            Shuffle();
 
             ContentView contentView = new ContentView
             {
@@ -78,88 +90,140 @@ namespace SliderDemo
         {
             GridItem item = (GridItem)sender;
 
-            Random rand = new Random();
-            int move = rand.Next(0, 4);
-
-            //Adjust random move to account for edges
-            if (move == 0 && item.Position.Row == 0)
+            //Did we click on empty? if so, do nothing
+            if (item.isEmptySpot() == true)
             {
-                move = 2;
+                return;
             }
 
-            else if (move== 1 && item.Position.Column == SIZE - 1)
-            {
-                move = 3;
-            }
+            //We know we didnt click on the empty spot
 
-            else if (move == 2 && item.Position.Row == SIZE - 1)
+            // Check up, down, left, right, until we find empty
+            
+            var counter = 0;
+            while ( counter < 4)
             {
-                move = 0;
-            }
+                GridPosition pos = null;
+                if (counter == 0 && item.CurrentPosition.Row != 0)
+                {
+                    //Get position of square above current item
+                    pos = new GridPosition(item.CurrentPosition.Row - 1, item.CurrentPosition.Column); 
+                }
+               else if (counter == 1 && item.CurrentPosition.Column != SIZE-1)
+                {
+                    //Get position of square to the right of current item
+                    pos = new GridPosition(item.CurrentPosition.Row, item.CurrentPosition.Column + 1);
+                }
+                else if (counter == 2 && item.CurrentPosition.Row != SIZE-1)
+                {
+                    //Get position of square below current item
+                    pos = new GridPosition(item.CurrentPosition.Row + 1, item.CurrentPosition.Column);
+                }
+                else if (counter == 3 && item.CurrentPosition.Column != 0)
+                {
+                    //Get position of square to the left current item
+                    pos = new GridPosition(item.CurrentPosition.Row, item.CurrentPosition.Column - 1);
+                }
 
-            else if (move == 3 && item.Position.Column == 0)
-            {
-                move = 1;
-            }
+                if (pos != null) //Dont have item to check because of edge
+                {
 
-            int row = 0;
-            int col = 0;
-
-            if (move == 0) //Move Up
-            {
-                row = item.Position.Row - 1;
-                col = item.Position.Column;
+                    GridItem swapWith = _gridItems[pos];
+                    if (swapWith.isEmptySpot())
+                    {
+                        Swap(item, swapWith);
+                        break; //if we found the empty spot, break the loop, no need to check further
+                    }
+                }
+                counter = counter + 1;
+                OnContentViewSizeChanged(this.Content, null);
             }
-
-            else if (move == 1) //Move Right
-            {
-                row = item.Position.Row;
-                col = item.Position.Column + 1;
-            }
-            else if (move == 2) //Move DOWN
-            {
-                row = item.Position.Row + 1;
-                col = item.Position.Column;
-            }
-            else //Move Left
-            {
-                row = item.Position.Row;
-                col = item.Position.Column - 1;
-            }
-
-            GridItem swapWith = _gridItems[new GridPosition(row, col)];
-            Swap(item, swapWith);
-            OnContentViewSizeChanged(this.Content, null);
-            //throw new NotImplementedException();
+            
         }
 
         void Swap(GridItem item1, GridItem item2)
         {
             //First Swap positions
-            GridPosition temp = item1.Position;
-            item1.Position = item2.Position;
-            item2.Position = temp;
+            GridPosition temp = item1.CurrentPosition;
+            item1.CurrentPosition = item2.CurrentPosition;
+            item2.CurrentPosition = temp;
 
             //Then update Dictionary too!
-            _gridItems[item1.Position] = item1;
-            _gridItems[item2.Position] = item2;
+            _gridItems[item1.CurrentPosition] = item1;
+            _gridItems[item2.CurrentPosition] = item2;
         }
 
+        void Shuffle()
+        {
+            Random rand = new Random();
+            for (var row=0; row<SIZE; row++)
+            {
+                for (var col=0; col<SIZE; col++)
+                {
+                    GridItem item = _gridItems[new GridPosition(row, col)];
+
+                    int swapRow = rand.Next(0,4);
+                    int swapCol = rand.Next(0, 4);
+                    GridItem swapItem = _gridItems[new GridPosition(swapRow, swapCol)];
+
+                    Swap(item, swapItem);
+                }
+            }
+        }
         internal class GridItem : Image //by extending :Label gives inheritence, allowing text, etc. and allows the grid item to be aware of its location
     {
-            public GridPosition Position
+            public GridPosition CurrentPosition
             {
                 get; set;
             }
 
-            public GridItem(GridPosition position, String text)
+            private GridPosition _finalPosition;
+            private Boolean _isEmptySpot;
+
+            public String ImgPath
             {
-                Position = position;
+                get; set;
+            }
+
+            public GridItem(GridPosition position, String text )//Boolean isEmptySpot = false)
+            {
+                _finalPosition = position;
+                CurrentPosition = position;
                 Source = ImageSource.FromResource(
                     "SliderDemo.images.image" + text +".jpeg");
-                
+                if(text.Equals("imageEmpty"))
+                {
+                    _isEmptySpot = true;
+                    Source = ImageSource.FromResource(
+                    "SliderDemo.images." + text + ".jpg");
+                }
+                else
+                {
+                    _isEmptySpot = false;
+                    Source = ImageSource.FromResource(
+                    "SliderDemo.images.image" + text + ".jpeg");
+                }
                 HorizontalOptions = LayoutOptions.FillAndExpand;
                 VerticalOptions = LayoutOptions.FillAndExpand;
+            }
+
+            public Boolean isEmptySpot()
+            {
+                return _isEmptySpot;
+
+            }
+
+            public void showImgPath()
+            {
+                if (isEmptySpot())
+                {
+                    Source = ImageSource.FromResource(this.ImgPath);
+                }
+            }
+
+            public Boolean isPositionCorrect()
+            {
+                return _finalPosition.Equals(CurrentPosition);
             }
     }
 
