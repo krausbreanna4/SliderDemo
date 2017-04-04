@@ -57,7 +57,7 @@ namespace SliderDemo
                 }
             }
 
-            //Shuffle();
+            Shuffle();
 
             ContentView contentView = new ContentView
             {
