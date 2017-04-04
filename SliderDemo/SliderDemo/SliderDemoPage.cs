@@ -57,19 +57,18 @@ namespace SliderDemo
                 }
             }
 
-            Shuffle();
+            //Shuffle();
 
             ContentView contentView = new ContentView
             {
                 Content = _absoluteLayout
             };
             contentView.SizeChanged += OnContentViewSizeChanged;
+
             this.Padding = new Thickness(5, Device.OnPlatform(25, 5, 5), 5, 5);
             this.Content = contentView;
         }
-
-
-
+        
         private void OnContentViewSizeChanged(object sender, EventArgs e)
         {
             ContentView contentView = (ContentView)sender;
@@ -90,57 +89,54 @@ namespace SliderDemo
         {
             GridItem item = (GridItem)sender;
 
-            //Did we click on empty? if so, do nothing
+            // Did we click on empty? If so do nothing
             if (item.isEmptySpot() == true)
             {
                 return;
             }
 
-            //We know we didnt click on the empty spot
+            // We know we didn't click on the empty spot
 
-            // Check up, down, left, right, until we find empty
-            
+            // Check up, down, left, right until we find empty
             var counter = 0;
-            while ( counter < 4)
+            while (counter < 4)
             {
                 GridPosition pos = null;
                 if (counter == 0 && item.CurrentPosition.Row != 0)
                 {
-                    //Get position of square above current item
-                    pos = new GridPosition(item.CurrentPosition.Row - 1, item.CurrentPosition.Column); 
+                    // Get position of square above current item
+                    pos = new GridPosition(item.CurrentPosition.Row - 1, item.CurrentPosition.Column);
                 }
-               else if (counter == 1 && item.CurrentPosition.Column != SIZE-1)
+                else if (counter == 1 && item.CurrentPosition.Column != SIZE - 1)
                 {
-                    //Get position of square to the right of current item
+                    // Get position of square to right of current item
                     pos = new GridPosition(item.CurrentPosition.Row, item.CurrentPosition.Column + 1);
                 }
-                else if (counter == 2 && item.CurrentPosition.Row != SIZE-1)
+                else if (counter == 2 && item.CurrentPosition.Row != SIZE - 1)
                 {
-                    //Get position of square below current item
+                    // Get position of square below current item
                     pos = new GridPosition(item.CurrentPosition.Row + 1, item.CurrentPosition.Column);
                 }
                 else if (counter == 3 && item.CurrentPosition.Column != 0)
                 {
-                    //Get position of square to the left current item
+                    // Get position of square to left of current item
                     pos = new GridPosition(item.CurrentPosition.Row, item.CurrentPosition.Column - 1);
                 }
 
-                if (pos != null) //Dont have item to check because of edge
+                if (pos != null) // Don't have item to check because of edge
                 {
-
                     GridItem swapWith = _gridItems[pos];
                     if (swapWith.isEmptySpot())
                     {
                         Swap(item, swapWith);
-                        break; //if we found the empty spot, break the loop, no need to check further
+                        winningTheGame();
+                        break;  // if we found the empty spot, break the loop, no need to check further 
                     }
                 }
                 counter = counter + 1;
-                OnContentViewSizeChanged(this.Content, null);
             }
-            
+            OnContentViewSizeChanged(this.Content, null);
         }
-
         void Swap(GridItem item1, GridItem item2)
         {
             //First Swap positions
@@ -151,6 +147,34 @@ namespace SliderDemo
             //Then update Dictionary too!
             _gridItems[item1.CurrentPosition] = item1;
             _gridItems[item2.CurrentPosition] = item2;
+        }
+
+
+        private void winningTheGame()
+        {
+            bool solved = true;
+            for (var row = 0; row < SIZE; row++)
+            {
+                for (var col = 0; col < SIZE; col++)
+                {
+                    GridItem item = _gridItems[new GridPosition(row, col)];
+                    if (!item.isPositionCorrect())
+                    {
+                        solved = false;
+
+                        break;
+                    }
+                   
+                        
+                };
+            }
+
+            if (solved)
+                {
+                //show image16
+                GridItem item = _gridItems[new GridPosition(3,3)];
+                item.correctImage();
+                }
         }
 
         void Shuffle()
@@ -207,6 +231,11 @@ namespace SliderDemo
                 VerticalOptions = LayoutOptions.FillAndExpand;
             }
 
+            public void correctImage()
+            {
+                Source = ImageSource.FromResource(
+                    "SliderDemo.images.image16.jpeg");
+            }
             public Boolean isEmptySpot()
             {
                 return _isEmptySpot;
